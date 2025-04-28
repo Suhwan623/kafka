@@ -1,8 +1,4 @@
-const express = require('express');
 const { Kafka } = require('kafkajs');
-
-const app = express();
-const port = 3000;
 
 const brokerUrl = process.env.KAFKA_BROKER_URL || 'localhost:9092';
 console.log('connect to', brokerUrl);
@@ -14,9 +10,9 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: 'test-group' });
 
-const runConsumer = async (res) => {
+const runConsumer = async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: 'cloudtype', fromBeginning: true });
+  await consumer.subscribe({ topic: 'test-topic', fromBeginning: true });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
@@ -30,8 +26,4 @@ const runConsumer = async (res) => {
   });
 };
 
-runConsumer().catch(console.error);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+module.exports = { runConsumer };
